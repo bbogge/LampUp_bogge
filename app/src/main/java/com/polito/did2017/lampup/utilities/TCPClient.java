@@ -101,7 +101,7 @@ public class TCPClient {
 
             //create a socket to make the connection with the server
             socket = new Socket(serverAddr, SERVER_PORT);
-            socket.setSoTimeout(1000);
+            socket.setSoTimeout(5000);
             //sends the message to the server
             mBufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
@@ -122,7 +122,7 @@ public class TCPClient {
             if (mServerMessage != null && mMessageListener != null) {
                 //call the method messageReceived from MyActivity class
                 mMessageListener.messageReceived(mServerMessage);
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
+                //Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
             }
 
             socket.close();
