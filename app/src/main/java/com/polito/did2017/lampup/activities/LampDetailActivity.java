@@ -46,6 +46,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import static java.lang.Thread.sleep;
+
 public class LampDetailActivity extends AppCompatActivity implements GyroLampFragment.OnGyroLampFragmentInteractionListener {
 
     private Context context = this;
@@ -54,6 +56,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private final static String SWITCH_PREF = "LastSwitchState";
     private final static String LUM_PREF = "LastLum";
     private final static String LAST_COLOR = "LastColor";
+    private final static int MIN_LUM = 5;
     private FABRevealLayout fabRevealLayout;
     private static GridView color_grid;
     private ColorGridAdapter cga;
@@ -81,6 +84,8 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private final String setLum = "setLum";
     private final String setColor = "setColor";
     private final String setMainServo = "setMainServo";
+    String prevMsg = "";
+
     //private final int MIN_LUM = 5;
     //private final int MAX_LUM = 255;
 
@@ -115,6 +120,9 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
 
         initLamp(selectedLamp);
 
+        // si può modificare la brigthness solo se lo switch è attivo
+        brightness.setEnabled(selectedLamp.isOn());
+
         //CONNECTION TCP
         tcpClient = new TCPClient( new TCPClient.OnMessageReceived() {
             @Override
@@ -127,62 +135,47 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                     @Override
                     public void run() {
 
-                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                        //Log.d( "message: ", message );
+                        //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 
                         String[] cmd_rcv = message.split( Pattern.quote( "$" ) ); // "updateState$State[0|1]$Lum[0-255])$Hue[0-255]$Saturation[0-255]);
-                        Log.e( "updateState string", cmd_rcv[0] );
+                        Log.e( "updateState string", message );
 
-                        if (cmd_rcv[0].trim().equals("updateState")) {
-                            switch (cmd_rcv[1].trim()) {
+                        if (cmd_rcv[0].equals("updateState")) {
+                            switch (cmd_rcv[1]) {
                                 case "0": // la lamp è stata spenta manualmente dal sensore
-                                    Log.e( "CMD 0", "CASE 0, lamp spenta"+ cmd_rcv[1]);
+                                    Log.e( "CMD_RCVD", "CASE 0, lamp spenta" + cmd_rcv[1]);
+                                    selectedLamp.setBrightness( MIN_LUM );
                                     selectedLamp.turnOff(); // setta lo stato della lampada a spento
                                     switchOnOff.setChecked( selectedLamp.isOn() ); // setta a false lo switch
                                     break;
                                 case "1": // è cambiata la luminosità o è stata accesa la lamp (da sensore)
-                                    Log.e( "CMD 1", "CASE 1, lamp accesa"+ cmd_rcv[1] );
+                                    Log.e( "CMD_RCVD", "CASE 1, lamp accesa" + cmd_rcv[1] );
+                                    int rcvd_lum = Integer.parseInt( cmd_rcv[2]);
+                                    selectedLamp.setBrightness( rcvd_lum );
+                                    brightness.setProgress( selectedLamp.getBrightness() );
+
                                     if (!selectedLamp.isOn()) { // se era spenta
+
+                                        // update di luminosità, hue e saturation
                                         selectedLamp.turnOn(); // setta lo stato della lampada a true
                                         switchOnOff.setChecked( selectedLamp.isOn() ); // setta a true lo switch
                                     }
 
-                                    // update di luminosità, hue e saturation
-                                    selectedLamp.setBrightness( Integer.parseInt( cmd_rcv[2] ) );
-                                    brightness.setProgress( selectedLamp.getBrightness() );
-
                                     // potrebbe non essere necessario
-                                    selectedLamp.setHueSat( Integer.parseInt( cmd_rcv[3] ), Integer.parseInt( cmd_rcv[4] ) );
+                                    //selectedLamp.setHueSat( Integer.parseInt( cmd_rcv[3] ), Integer.parseInt( cmd_rcv[4] ) );
                                     break;
 
                                 default:
-                                    Log.e( "CMD", "Comando ricevuto da arduino SCONOSCIUTO!" );
+                                    Log.e( "CMD_RCVD", "Il secondo parametro del pacchetto deve essere lo stato ON(1)/OFF(0) della lampada" );
                                     break;
                             }
+                        } else if(cmd_rcv[0].equals("")) {
+                            // tutto regolare
+                            //Log.e( "CMD_RCVD", "Tutto regolare" );
                         } else {
-                            Log.e( "CMD", "Comando ricevuto da arduino NOT update" );
+                            Log.e( "CMD_RCVD", "Comando ricevuto da arduino SCONOSCIUTO!" );
                         }
-                        /*switch (cmd_rcv[0]) {
-
-                            case turnOn:
-                                selectedLamp.turnOn();
-                                switchOnOff.setChecked(true);
-                                break;
-
-                            case turnOff:
-                                selectedLamp.turnOff();
-                                switchOnOff.setChecked(false);
-                                break;
-
-                            case setLum:
-                                if(cmd_rcv.length > 1) {
-                                    Toast.makeText(context, cmd_rcv[1], Toast.LENGTH_SHORT).show();
-                                    selectedLamp.setBrightness(Integer.parseInt(cmd_rcv[1]));
-                                    brightness.setProgress(selectedLamp.getBrightness());
-                                }
-                                break;
-                        }*/
-                    } // This is your code
+                    }
                 };
                 mainHandler.post( myRunnable );
             }
@@ -199,10 +192,21 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 selectedLamp.setState( switchOnOff.isChecked() );
                 if(switchOnOff.isChecked()) {
-                    tcpClient.setMessage(turnOn);
+                    selectedLamp.turnOn();
                     brightness.setEnabled(true);
+                    brightness.setProgress( selectedLamp.getBrightness() );
+
+                    tcpClient.setMessage(turnOn);
+                    try {
+                        sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    tcpClient.setMessage(setLum + "$" + selectedLamp.getBrightness());
+
                 }
                 else {
+                    selectedLamp.turnOff();
                     tcpClient.setMessage(turnOff);
                     brightness.setEnabled(false);
                 }
@@ -244,14 +248,12 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         cga = new ColorGridAdapter(context, colors, tcpClient);
         color_grid.setAdapter(cga);
 
-        //brightness.setProgress( selectedLamp.getBrightness() );
-
         brightness.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //setta la luminosità
+                //setta la luminosità ad un minimo sindacale
                 if(progress == 0)
-                    progress = 5;
+                    progress = MIN_LUM;
                 selectedLamp.setBrightness( progress );
             }
 
