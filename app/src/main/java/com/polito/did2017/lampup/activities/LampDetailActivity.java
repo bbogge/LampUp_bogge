@@ -195,10 +195,14 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 selectedLamp.setState( switchOnOff.isChecked() );
-                if(switchOnOff.isChecked())
+                if(switchOnOff.isChecked()) {
                     tcpClient.setMessage(turnOn);
-                else
+                    brightness.setEnabled(true);
+                }
+                else {
                     tcpClient.setMessage(turnOff);
+                    brightness.setEnabled(false);
+                }
 
             }
         });
