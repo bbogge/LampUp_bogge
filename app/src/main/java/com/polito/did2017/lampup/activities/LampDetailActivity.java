@@ -7,8 +7,10 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -82,6 +84,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     //private final int MIN_LUM = 5;
     //private final int MAX_LUM = 255;
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -241,7 +244,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         cga = new ColorGridAdapter(context, colors, tcpClient);
         color_grid.setAdapter(cga);
 
-        brightness.setProgress( selectedLamp.getBrightness() );
+        //brightness.setProgress( selectedLamp.getBrightness() );
 
         brightness.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener() {
             @Override
