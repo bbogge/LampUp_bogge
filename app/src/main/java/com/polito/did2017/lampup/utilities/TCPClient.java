@@ -1,5 +1,6 @@
 package com.polito.did2017.lampup.utilities;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -10,6 +11,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import static java.lang.Thread.sleep;
 
@@ -36,7 +38,7 @@ public class TCPClient {
     //socket
     private Socket socket;
     //message
-    private static final String DEFAULT= "?";
+    private static final String DEFAULT= ".";
     private String message = DEFAULT;
 
     /**
@@ -52,6 +54,7 @@ public class TCPClient {
      *
      * @param message text entered by client
      */
+
     private String sendMessage(final String message) {
         Runnable runnable = new Runnable() {
             @Override
@@ -87,7 +90,7 @@ public class TCPClient {
         mServerMessage = null;
     }
 
-    public void run() throws IOException, InterruptedException{
+    public void run() throws IOException {
 
         mRun = true;
 
@@ -117,6 +120,8 @@ public class TCPClient {
                 socket.close();
                 if(sent.equals(message))
                     this.setMessage(DEFAULT);
+            } catch (SocketException e) {
+                e.printStackTrace();
             }
 
             if (mServerMessage != null && mMessageListener != null) {
@@ -131,7 +136,11 @@ public class TCPClient {
 
             Log.e("TCP Client", "C: Disconnected");
 
-            sleep(1000);
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+                //e.printStackTrace();
+            }
         }
 
     }

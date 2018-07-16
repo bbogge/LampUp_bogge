@@ -76,6 +76,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private Lamp selectedLamp;
     private TCPClient tcpClient;
     private ConnectTask connectTask;
+    boolean firstTime = true;
 
     //default commands
     private final String turnOn = "turnOn";
@@ -135,10 +136,11 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                     @Override
                     public void run() {
 
+
                         //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
 
                         String[] cmd_rcv = message.split( Pattern.quote( "$" ) ); // "updateState$State[0|1]$Lum[0-255])$Hue[0-255]$Saturation[0-255]);
-                        Log.e( "updateState string", message );
+                        Log.e( "message string", message );
 
                         if (cmd_rcv[0].equals("updateState")) {
                             switch (cmd_rcv[1]) {
@@ -169,7 +171,21 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                                     Log.e( "CMD_RCVD", "Il secondo parametro del pacchetto deve essere lo stato ON(1)/OFF(0) della lampada" );
                                     break;
                             }
-                        } else if(cmd_rcv[0].equals("")) {
+                        } /*else if(cmd_rcv[0].equals("lampState")) {
+                            //if(cmd_rcv[1].equals( "true" )) {
+                            if (firstTime) {
+                                selectedLamp.setState( Boolean.parseBoolean( cmd_rcv[1] ) );
+                                switchOnOff.setChecked( selectedLamp.isOn() );
+
+                                if (selectedLamp.isOn()) {
+                                    brightness.setProgress( Integer.parseInt( cmd_rcv[2] ) );
+                                } else {
+                                    selectedLamp.setState( false );
+                                    switchOnOff.setChecked( selectedLamp.isOn() );
+                                }
+                                firstTime = false;
+                            }
+                        }*/ else if(cmd_rcv[0].equals("")) {
                             // tutto regolare
                             //Log.e( "CMD_RCVD", "Tutto regolare" );
                         } else {
@@ -245,7 +261,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                 animateColorElement();
             }
         });
-        cga = new ColorGridAdapter(context, colors, tcpClient);
+        cga = new ColorGridAdapter(context, colors, tcpClient, selectedLamp, switchOnOff, brightness);
         color_grid.setAdapter(cga);
 
         brightness.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener() {
@@ -285,6 +301,9 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                 saveColors(colors, COLORS_PREFS);
                 float Hue = hsv[0]*HSVtoRGBConvertFactor;
                 float Saturation = hsv[1]*255.0f;
+                // aggiorna i dati di lampada e aggiorna la vista
+                selectedLamp.turnOn();
+                switchOnOff.setChecked( selectedLamp.isOn() );
                 tcpClient.setMessage("setHueSat" + "$" + Hue + "$" + Saturation);
             }
         });
@@ -301,6 +320,28 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         saveSwitchState();
         saveLum();
         saveLastColor();
+
+        if (tcpClient != null) {
+            tcpClient.stopClient();
+            tcpClient = null;
+        }
+        if(connectTask != null && tcpClient == null){
+            connectTask.cancel(true);
+            connectTask = null;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (tcpClient != null) {
+            tcpClient.stopClient();
+            tcpClient = null;
+        }
+        if(connectTask != null && tcpClient == null){
+            connectTask.cancel(true);
+            connectTask = null;
+        }
     }
 
     private void checkLampId(String fragId) {

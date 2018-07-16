@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.polito.did2017.lampup.R;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 
 import static com.polito.did2017.lampup.activities.LampDetailActivity.HSVtoRGBConvertFactor;
 import static com.polito.did2017.lampup.activities.LampDetailActivity.colorSelection;
+import static java.lang.Thread.sleep;
 
 /**
  * Created by marco on 20/06/2018.
@@ -27,12 +30,18 @@ public class ColorGridAdapter extends BaseAdapter {
     private Context context;
     private ArrayList<Integer> colors;
     private TCPClient tcpClient;
+    private Lamp selectedLamp;
+    private Switch switchOnOff;
+    private SeekBar brigthness;
     private float[] hsv = new float[3];
 
-    public ColorGridAdapter(Context context, ArrayList<Integer> colors, TCPClient tcpClient) {
+    public ColorGridAdapter(Context context, ArrayList<Integer> colors, TCPClient tcpClient, Lamp selectedLamp, Switch switchOnOff, SeekBar brigthness) {
         this.context = context;
         this.colors = colors;
         this.tcpClient = tcpClient;
+        this.selectedLamp = selectedLamp;
+        this.switchOnOff = switchOnOff;
+        this.brigthness = brigthness;
     }
 
     @Override
@@ -70,8 +79,24 @@ public class ColorGridAdapter extends BaseAdapter {
                 Color.colorToHSV(color, hsv);
                 float Hue = hsv[0]*HSVtoRGBConvertFactor;
                 float Saturation = hsv[1]*255.0f;
-                tcpClient.setMessage("setHueSat" + "$" + Hue + "$" + Saturation);
                 //Toast.makeText(context, String.valueOf("setHue" + "$" + Hue), Toast.LENGTH_SHORT).show();
+                // aggiorno i dati della lampada e aggiorno la vista
+                selectedLamp.turnOn();
+                switchOnOff.setChecked( selectedLamp.isOn() );
+               /* if(selectedLamp.getBrightness() == 0) {
+                    selectedLamp.setBrightness( 10 );
+                }
+                brigthness.setProgress( selectedLamp.getBrightness() );
+                tcpClient.setMessage("setLum" + "$" + selectedLamp.getBrightness());
+
+                try {
+                    sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+*/
+                tcpClient.setMessage("setHueSat" + "$" + Hue + "$" + Saturation);
+
             }
         });
 
