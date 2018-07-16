@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="10dp">
+
+    <View
+        android:id="@+id/hue_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:background="@drawable/hue_gradient"/>
+
+    <SeekBar
+        android:id="@+id/hue_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="360"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="-10dp"
+        android:progressDrawable="@drawable/transparent"
+        android:thumb="@drawable/ic_color_picker_arrow"
+        android:thumbTint="@color/colorAccent"/>
+
+    <View
+        android:id="@+id/saturation_gradient"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="26dp"
+        android:layout_marginRight="26dp"
+        android:background="@drawable/shape_saturation_gradient"/>
+
+    <SeekBar
+        android:id="@+id/saturation_slider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="100"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="-10dp"
+        android:progressDrawable="@drawable/transparent"
+        android:thumb="@drawable/ic_color_picker_arrow"
+        android:thumbTint="@color/colorAccent"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <ImageButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:elevation="4dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/shape_red_circle"
+            android:src="@drawable/ic_close_24dp"/>
+
+        <ImageButton
+            android:id="@+id/btn_done"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:elevation="4dp"
+            android:layout_margin="5dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/shape_green_circle"
+            android:src="@drawable/ic_check_24dp"/>
+
+    </RelativeLayout>
+
+</LinearLayout>
