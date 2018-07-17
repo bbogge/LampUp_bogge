@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -93,42 +94,42 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lamp_detail);
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_lamp_detail );
 
-        switchOnOff = findViewById(R.id.switchOnOff);
-        color_picker = findViewById(R.id.sliders);
-        color = findViewById(R.id.secondary_view);
-        hue = findViewById(R.id.hue_slider);
-        saturation = findViewById(R.id.saturation_slider);
-        brightness = findViewById(R.id.brightness_slider);
+        switchOnOff = findViewById( R.id.switchOnOff );
+        color_picker = findViewById( R.id.sliders );
+        color = findViewById( R.id.secondary_view );
+        hue = findViewById( R.id.hue_slider );
+        saturation = findViewById( R.id.saturation_slider );
+        brightness = findViewById( R.id.brightness_slider );
 
         final Intent i = getIntent();
 
-        if(i.hasExtra( "lamp_ip" )) {
-            lampIP = i.getStringExtra("lamp_ip");
+        if (i.hasExtra( "lamp_ip" )) {
+            lampIP = i.getStringExtra( "lamp_ip" );
         } else {
-            System.out.println("no lamp_ip");
+            System.out.println( "no lamp_ip" );
         }
 
         //trova la lampada che si vuole utilizzare
         for (Lamp lamp : lampManager.getLamps()) {
-            if(lamp.getLampIP().equals( lampIP )) {
+            if (lamp.getLampIP().equals( lampIP )) {
                 selectedLamp = lamp;
                 break;
             }
         }
 
-        initLamp(selectedLamp);
+        initLamp( selectedLamp );
 
         // si può modificare la brigthness solo se lo switch è attivo
-        brightness.setEnabled(selectedLamp.isOn());
+        brightness.setEnabled( selectedLamp.isOn() );
 
         //CONNECTION TCP
         tcpClient = new TCPClient( new TCPClient.OnMessageReceived() {
             @Override
             //here the messageReceived method is implemented
-            public void messageReceived( final String message ) {
+            public void messageReceived(final String message) {
                 //this method calls the onProgressUpdate
                 // Get a handler that can be used to post to the main thread
                 Handler mainHandler = new Handler( getApplicationContext().getMainLooper() );
@@ -142,17 +143,17 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                         String[] cmd_rcv = message.split( Pattern.quote( "$" ) ); // "updateState$State[0|1]$Lum[0-255])$Hue[0-255]$Saturation[0-255]);
                         Log.e( "message string", message );
 
-                        if (cmd_rcv[0].equals("updateState")) {
+                        if (cmd_rcv[0].equals( "updateState" )) {
                             switch (cmd_rcv[1]) {
                                 case "0": // la lamp è stata spenta manualmente dal sensore
-                                    Log.e( "CMD_RCVD", "CASE 0, lamp spenta" + cmd_rcv[1]);
+                                    Log.e( "CMD_RCVD", "CASE 0, lamp spenta" + cmd_rcv[1] );
                                     selectedLamp.setBrightness( MIN_LUM );
                                     selectedLamp.turnOff(); // setta lo stato della lampada a spento
                                     switchOnOff.setChecked( selectedLamp.isOn() ); // setta a false lo switch
                                     break;
                                 case "1": // è cambiata la luminosità o è stata accesa la lamp (da sensore)
                                     Log.e( "CMD_RCVD", "CASE 1, lamp accesa" + cmd_rcv[1] );
-                                    int rcvd_lum = Integer.parseInt( cmd_rcv[2]);
+                                    int rcvd_lum = Integer.parseInt( cmd_rcv[2] );
                                     selectedLamp.setBrightness( rcvd_lum );
                                     brightness.setProgress( selectedLamp.getBrightness() );
 
@@ -185,7 +186,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                                 }
                                 firstTime = false;
                             }
-                        }*/ else if(cmd_rcv[0].equals("")) {
+                        }*/ else if (cmd_rcv[0].equals( "" )) {
                             // tutto regolare
                             //Log.e( "CMD_RCVD", "Tutto regolare" );
                         } else {
@@ -198,115 +199,123 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         }, selectedLamp.getLampIP() );
 
         //CONNECT TASK, non bloccante
-        connectTask = new ConnectTask(getApplicationContext(), this);
-        connectTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, tcpClient);
+        connectTask = new ConnectTask( getApplicationContext(), this );
+        connectTask.executeOnExecutor( AsyncTask.THREAD_POOL_EXECUTOR, tcpClient );
 
         //SWITCH ON-OFF
         switchOnOff.setChecked( selectedLamp.isOn() );
-        switchOnOff.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switchOnOff.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 selectedLamp.setState( switchOnOff.isChecked() );
-                if(switchOnOff.isChecked()) {
+                if (switchOnOff.isChecked()) {
                     selectedLamp.turnOn();
-                    brightness.setEnabled(true);
+                    brightness.setEnabled( true );
                     brightness.setProgress( selectedLamp.getBrightness() );
 
-                    tcpClient.setMessage(turnOn);
+                    tcpClient.setMessage( turnOn );
                     try {
-                        sleep(200);
+                        sleep( 200 );
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    tcpClient.setMessage(setLum + "$" + selectedLamp.getBrightness());
+                    tcpClient.setMessage( setLum + "$" + selectedLamp.getBrightness() );
 
-                }
-                else {
+                } else {
                     selectedLamp.turnOff();
-                    tcpClient.setMessage(turnOff);
-                    brightness.setEnabled(false);
+                    tcpClient.setMessage( turnOff );
+                    brightness.setEnabled( false );
                 }
 
             }
-        });
+        } );
 
-        if(getColors(COLORS_PREFS)!=null) {
-            colors = getColors(COLORS_PREFS);
+        if (getColors( COLORS_PREFS ) != null) {
+            colors = getColors( COLORS_PREFS );
             lastSize = colors.size();
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Toolbar toolbar = findViewById( R.id.toolbar );
+        setSupportActionBar( toolbar );
+        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
 
         //int fragId = i.getIntExtra("lamp", 0);
-        String fragId = i.getStringExtra("lamp_name");
+        String fragId = i.getStringExtra( "lamp_name" );
 
-        checkLampId(fragId);
+        checkLampId( fragId );
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment, "gyrolamp");
-        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        fragmentTransaction.commit();
+        if (fragId.equals( "gyro_lamp" )) {
 
-        ((GyroLampFragment)fragment).setAngle(PreferenceManager.getDefaultSharedPreferences(context).getInt(ANGLE_PREF, 80));
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace( R.id.fragment_container, fragment, "gyrolamp" );
+            fragmentTransaction.setTransition( FragmentTransaction.TRANSIT_FRAGMENT_OPEN );
+            fragmentTransaction.commit();
 
-        fabRevealLayout = findViewById(R.id.fab_reveal_layout);
-        configureFABReveal(fabRevealLayout);
-        color_grid = findViewById(R.id.color_grid);
-        color_grid.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
-                animateColorElement();
-            }
-        });
-        cga = new ColorGridAdapter(context, colors, tcpClient, selectedLamp, switchOnOff, brightness);
-        color_grid.setAdapter(cga);
+            ((GyroLampFragment) fragment).setAngle( PreferenceManager.getDefaultSharedPreferences( context ).getInt( ANGLE_PREF, 80 ) );
 
-        brightness.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //setta la luminosità ad un minimo sindacale
-                if(progress == 0)
-                    progress = MIN_LUM;
-                selectedLamp.setBrightness( progress );
-            }
+            fabRevealLayout = findViewById( R.id.fab_reveal_layout );
+            configureFABReveal( fabRevealLayout );
+            color_grid = findViewById( R.id.color_grid );
+            color_grid.addOnLayoutChangeListener( new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                    animateColorElement();
+                }
+            } );
+            cga = new ColorGridAdapter( context, colors, tcpClient, selectedLamp, switchOnOff, brightness );
+            color_grid.setAdapter( cga );
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                Log.d("Brightness", "Seekbar luminosità cambiata");
-                if(selectedLamp.isOn())
-                    tcpClient.setMessage( setLum + "$" + selectedLamp.getBrightness());
-            }
-        } );
-        resetColor(getResources().getColor(R.color.colorAccent));
-        initHS();
-        ImageButton cancel = color_picker.findViewById(R.id.btn_cancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fabRevealLayout.revealMainView();
-            }
-        });
-        ImageButton confirm = color_picker.findViewById(R.id.btn_done);
-        confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                colors.add(Color.HSVToColor(hsv));
-                cga.notifyDataSetChanged();
-                fabRevealLayout.revealMainView();
-                saveColors(colors, COLORS_PREFS);
-                float Hue = hsv[0]*HSVtoRGBConvertFactor;
-                float Saturation = hsv[1]*255.0f;
-                // aggiorna i dati di lampada e aggiorna la vista
-                selectedLamp.turnOn();
-                switchOnOff.setChecked( selectedLamp.isOn() );
-                tcpClient.setMessage("setHueSat" + "$" + Hue + "$" + Saturation);
-            }
-        });
+            brightness.setOnSeekBarChangeListener( new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    //setta la luminosità ad un minimo sindacale
+                    if (progress == 0)
+                        progress = MIN_LUM;
+                    selectedLamp.setBrightness( progress );
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    Log.d( "Brightness", "Seekbar luminosità cambiata" );
+                    if (selectedLamp.isOn())
+                        tcpClient.setMessage( setLum + "$" + selectedLamp.getBrightness() );
+                }
+            } );
+            resetColor( getResources().getColor( R.color.colorAccent ) );
+            initHS();
+            ImageButton cancel = color_picker.findViewById( R.id.btn_cancel );
+            cancel.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fabRevealLayout.revealMainView();
+                }
+            } );
+            ImageButton confirm = color_picker.findViewById( R.id.btn_done );
+            confirm.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    colors.add( Color.HSVToColor( hsv ) );
+                    cga.notifyDataSetChanged();
+                    fabRevealLayout.revealMainView();
+                    saveColors( colors, COLORS_PREFS );
+                    float Hue = hsv[0] * HSVtoRGBConvertFactor;
+                    float Saturation = hsv[1] * 255.0f;
+                    // aggiorna i dati di lampada e aggiorna la vista
+                    selectedLamp.turnOn();
+                    switchOnOff.setChecked( selectedLamp.isOn() );
+                    tcpClient.setMessage( "setHueSat" + "$" + Hue + "$" + Saturation );
+                }
+            } );
+        } /*else {
+            TextView textView = new TextView( this );
+            String string = "No " + fragId + " found!";
+                    textView.setText( string );
+        }*/
     }
 
     private void initLamp(Lamp selectedLamp) {
@@ -349,6 +358,8 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             case "gyro_lamp":
                 fragment = new GyroLampFragment();
                 break;
+            default:
+                fragment = new Fragment();
         }
     }
 
