@@ -1,6 +1,7 @@
 package com.polito.did2017.lampup.utilities;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
                 lamps.get(position).setState(holder.lampSwitch.isChecked());
 
                 try {
+                    Log.d( "UDP SENDER", "Sono al listener del check" );
                     udpAsyncTask.sendUDPdatagram( InetAddress.getByName( lamps.get( position ).getLampIP() ), lamps.get( position ).isOn() );
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
