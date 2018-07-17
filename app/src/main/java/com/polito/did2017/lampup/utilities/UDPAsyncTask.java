@@ -47,7 +47,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
             if (socket == null || socket.isClosed()) {
                 socket = new DatagramSocket(udpPort);
             }
-            socket.setSoTimeout(5000);
+            socket.setSoTimeout(4000);
         } catch (SocketException e) {
             e.printStackTrace();
         }
