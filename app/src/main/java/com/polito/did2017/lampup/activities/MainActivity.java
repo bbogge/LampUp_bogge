@@ -37,11 +37,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
 
-        adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask);
-        rv.setAdapter(adapter);
-
-        lampManager.discover(udpAsyncTask);
-
         ItemClickSupport.addTo(rv).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -53,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity( detailIntent );
             }
         });
+
+        lampManager.discover(udpAsyncTask);
+
+        adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask);
+        rv.setAdapter(adapter);
 
 //        ok = findViewById(R.id.button);
 //
@@ -68,8 +68,16 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        // per avere la lista aggiornata con solo le lampade presenti
         rv.getAdapter().notifyDataSetChanged();
         super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        // per avere la lista aggiornata con solo le lampade presenti
+        rv.getAdapter().notifyDataSetChanged();
+        super.onRestart();
     }
 
     @Override

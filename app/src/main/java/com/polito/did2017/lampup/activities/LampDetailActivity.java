@@ -126,16 +126,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && selectedLamp.isOn()) {
-            switchOnOff.setTrackTintMode( PorterDuff.Mode.SCREEN );
-        }
-
-        textLampName.setText( selectedLamp.getLampName() );
-
         initLamp( selectedLamp );
-
-        // si può modificare la brigthness solo se lo switch è attivo
-        brightness.setEnabled( selectedLamp.isOn() );
 
         //CONNECTION TCP
         tcpClient = new TCPClient( new TCPClient.OnMessageReceived() {
@@ -304,6 +295,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     Log.d( "Brightness", "Seekbar luminosità cambiata" );
+                    selectedLamp.setBrightness( seekBar.getProgress() );
                     if (selectedLamp.isOn())
                         tcpClient.setMessage( setLum + "$" + selectedLamp.getBrightness() );
                 }
@@ -343,6 +335,16 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private void initLamp(Lamp selectedLamp) {
         //selectedLamp.setState(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SWITCH_PREF, false));
         selectedLamp.setBrightness(PreferenceManager.getDefaultSharedPreferences(context).getInt(LUM_PREF, 128));
+
+        textLampName.setText( selectedLamp.getLampName() );
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && selectedLamp.isOn()) {
+            switchOnOff.setTrackTintMode( PorterDuff.Mode.SCREEN );
+        }
+
+        // si può modificare la brigthness solo se lo switch è attivo
+        brightness.setEnabled( selectedLamp.isOn() );
+        brightness.setProgress( selectedLamp.getBrightness() );
     }
 
     @Override
@@ -365,6 +367,10 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     @Override
     protected void onPause() {
         super.onPause();
+        saveSwitchState();
+        saveLum();
+        saveLastColor();
+
         if (tcpClient != null) {
             tcpClient.stopClient();
             tcpClient = null;
@@ -546,7 +552,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     public void saveLum() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(LUM_PREF, brightness.getProgress());
+        editor.putInt(LUM_PREF, selectedLamp.getBrightness());
         editor.commit();
     }
 

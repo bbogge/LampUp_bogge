@@ -68,7 +68,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
             }
             catch (SocketTimeoutException e) {
-                //this.publishProgress( "upDateUI" );
+                this.publishProgress( "upDateUI" );
                 continue;
             }
             catch (IOException e) {
