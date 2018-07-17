@@ -126,6 +126,10 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && selectedLamp.isOn()) {
+            switchOnOff.setTrackTintMode( PorterDuff.Mode.SCREEN );
+        }
+
         textLampName.setText( selectedLamp.getLampName() );
 
         initLamp( selectedLamp );
