@@ -3,6 +3,7 @@ package com.polito.did2017.lampup.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
@@ -221,6 +222,8 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                     }
 
                     selectedLamp.turnOn();
+                    brightness.getProgressDrawable().setAlpha(255);
+                    brightness.getThumb().setAlpha(255);
                     brightness.setEnabled( true );
                     brightness.setProgress( selectedLamp.getBrightness() );
 
@@ -239,6 +242,8 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                     selectedLamp.turnOff();
                     tcpClient.setMessage( turnOff );
                     brightness.setEnabled( false );
+                    brightness.getProgressDrawable().setAlpha(100);
+                    brightness.getThumb().setAlpha(100);
                 }
             }
         } );

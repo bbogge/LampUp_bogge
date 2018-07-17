@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.polito.did2017.lampup.activities.LampDetailActivity"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="4dp"
+        app:titleTextAppearance="@style/Toolbar.TitleText">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <Switch
+                android:id="@+id/switchOnOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="15dp"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <SeekBar
+                android:id="@+id/brightness_slider"
+                android:layout_width="290dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                android:paddingBottom="30dp"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:max="255"
+                android:progress="50"
+                android:thumb="@drawable/ic_brightness_high_black_down"
+                android:thumbTint="@color/colorAccent"/>
+
+            <com.truizlop.fabreveallayout.FABRevealLayout
+                android:id="@+id/fab_reveal_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="4dp"
+                    android:src="@drawable/color64"
+                    app:backgroundTint="@color/colorAccent"/>
+
+                <LinearLayout
+                    android:id="@+id/main_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:gravity="bottom"
+                    android:orientation="vertical">
+
+                    <GridView
+                        android:id="@+id/color_grid"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="30dp"
+                        android:columnWidth="64dp"
+                        android:numColumns="auto_fit"
+                        android:paddingTop="10dp"
+                        android:stretchMode="spacingWidthUniform"
+                        android:verticalSpacing="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/secondary_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="bottom"
+                    android:orientation="vertical"
+                    android:background="@color/colorAccent">
+
+                    <include
+                        android:id="@+id/sliders"
+                        layout="@layout/color_picker" />
+
+                </LinearLayout>
+
+            </com.truizlop.fabreveallayout.FABRevealLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
