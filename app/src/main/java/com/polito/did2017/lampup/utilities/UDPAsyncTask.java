@@ -113,7 +113,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
         try {
             socket.send(p);//properly able to send data. i receive data to server
-            Log.e( "UDP SENDER TASK", "Inviato UDP a: " + lampIP + ", message: " + message );
+            Log.e( "UDP SENDER TASK", "Inviato UDP a: " + lampIP + ", message: " + messageStr );
 
         } catch (IOException e) {
             e.printStackTrace();
