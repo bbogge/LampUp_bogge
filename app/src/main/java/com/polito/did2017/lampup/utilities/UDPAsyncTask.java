@@ -89,13 +89,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
     public void sendUDPdatagram(InetAddress lampIP, boolean lampState) {
         // per inviare pacchetto udp per lo switch della lista lampade
-
         String messageStr = (lampState) ? "turnOn" : "turnOff";
-
-        /*if(lampState)
-            messageStr = "turnOn";
-        else
-            messageStr = "turnOff";*/
 
         int msgLength = messageStr.length();
         byte[] message = messageStr.getBytes();
@@ -104,7 +98,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
             if (socket == null || socket.isClosed()) {
                 socket = new DatagramSocket(udpPort);
             }
-            socket.setSoTimeout(1000);
+            socket.setSoTimeout(600);
         } catch (SocketException e) {
             e.printStackTrace();
         }

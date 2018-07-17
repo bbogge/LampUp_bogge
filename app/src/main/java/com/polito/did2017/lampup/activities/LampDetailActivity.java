@@ -341,7 +341,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     }
 
     private void initLamp(Lamp selectedLamp) {
-        selectedLamp.setState(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SWITCH_PREF, false));
+        //selectedLamp.setState(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SWITCH_PREF, false));
         selectedLamp.setBrightness(PreferenceManager.getDefaultSharedPreferences(context).getInt(LUM_PREF, 128));
     }
 
