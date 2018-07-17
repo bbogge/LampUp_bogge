@@ -45,4 +45,8 @@ public class LampManager {
         udpAsyncTask.execute();
     }
 
+    public  void sendUDP_switchState(final UDPAsyncTask udpAsyncTask) {
+
+    }
+
 }

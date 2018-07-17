@@ -6,8 +6,11 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 /**
  * Created by matil on 14/03/2018.
@@ -18,6 +21,9 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
     private Runnable updateUI;
     private boolean keepListening;
     private final int udpPort = 4096;
+    private LampManager lm = LampManager.getInstance();
+
+    DatagramSocket socket = null;
 
     public UDPAsyncTask(Runnable updateUI) {
         this.updateUI = updateUI;
@@ -34,7 +40,6 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
         keepListening = true;
 
-        DatagramSocket socket = null;
         byte[] recvBuf = new byte[64000];
         DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
 
@@ -80,5 +85,37 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
     public void stopListening() {
         keepListening = false;
+    }
+
+    public void sendUDPdatagram(InetAddress lampIP, boolean lampState) {
+        // per inviare pacchetto udp per lo switch della lista lampade
+
+        String messageStr = (lampState) ? "turnOn" : "turnOff";
+
+        /*if(lampState)
+            messageStr = "turnOn";
+        else
+            messageStr = "turnOff";*/
+
+        int msgLength = messageStr.length();
+        byte[] message = messageStr.getBytes();
+
+        try {
+            if (socket == null || socket.isClosed()) {
+                socket = new DatagramSocket(udpPort);
+            }
+            socket.setSoTimeout(1000);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        DatagramPacket p = new DatagramPacket(message, msgLength, lampIP, udpPort);
+
+        try {
+            socket.send(p);//properly able to send data. i receive data to server
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

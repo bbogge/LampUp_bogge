@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -43,6 +44,8 @@ import com.polito.did2017.lampup.utilities.TCPClient;
 import com.truizlop.fabreveallayout.FABRevealLayout;
 import com.truizlop.fabreveallayout.OnRevealChangeListener;
 
+import org.w3c.dom.Text;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -65,6 +68,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private LinearLayout color;
     private SeekBar hue, saturation, brightness;
     private Switch switchOnOff;
+    private TextView textLampName;
     private Fragment fragment;
     private float[] hsv = new float[3];
     public static float HSVtoRGBConvertFactor = 255.0f/360.0f;
@@ -86,7 +90,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private final String setLum = "setLum";
     private final String setColor = "setColor";
     private final String setMainServo = "setMainServo";
-    String prevMsg = "";
+    private final String setHueSat = "setHueSat";
 
     //private final int MIN_LUM = 5;
     //private final int MAX_LUM = 255;
@@ -97,6 +101,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_lamp_detail );
 
+        textLampName = findViewById( R.id.textLampName );
         switchOnOff = findViewById( R.id.switchOnOff );
         color_picker = findViewById( R.id.sliders );
         color = findViewById( R.id.secondary_view );
@@ -119,6 +124,8 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                 break;
             }
         }
+
+        textLampName.setText( selectedLamp.getLampName() );
 
         initLamp( selectedLamp );
 
@@ -209,6 +216,10 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 selectedLamp.setState( switchOnOff.isChecked() );
                 if (switchOnOff.isChecked()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        switchOnOff.setTrackTintMode( PorterDuff.Mode.SCREEN );
+                    }
+
                     selectedLamp.turnOn();
                     brightness.setEnabled( true );
                     brightness.setProgress( selectedLamp.getBrightness() );
@@ -220,13 +231,15 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                         e.printStackTrace();
                     }
                     tcpClient.setMessage( setLum + "$" + selectedLamp.getBrightness() );
-
                 } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        switchOnOff.setTrackTintMode( PorterDuff.Mode.MULTIPLY );
+                    }
+
                     selectedLamp.turnOff();
                     tcpClient.setMessage( turnOff );
                     brightness.setEnabled( false );
                 }
-
             }
         } );
 
@@ -308,7 +321,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                     // aggiorna i dati di lampada e aggiorna la vista
                     selectedLamp.turnOn();
                     switchOnOff.setChecked( selectedLamp.isOn() );
-                    tcpClient.setMessage( "setHueSat" + "$" + Hue + "$" + Saturation );
+                    tcpClient.setMessage( setHueSat + "$" + Hue + "$" + Saturation );
                 }
             } );
         } /*else {

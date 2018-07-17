@@ -37,8 +37,10 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
 
-        adapter = new LampAdapter(lampManager.getLamps());
+        adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask);
         rv.setAdapter(adapter);
+
+        lampManager.discover(udpAsyncTask);
 
         ItemClickSupport.addTo(rv).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
@@ -51,8 +53,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity( detailIntent );
             }
         });
-
-        lampManager.discover(udpAsyncTask);
 
 //        ok = findViewById(R.id.button);
 //

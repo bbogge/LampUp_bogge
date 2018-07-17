@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.polito.did2017.lampup.R;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -20,9 +22,11 @@ import java.util.List;
 public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder> {
 
     List<Lamp> lamps;
+    UDPAsyncTask udpAsyncTask;
 
-    public LampAdapter(List<Lamp> lamps){
+    public LampAdapter(List<Lamp> lamps, UDPAsyncTask udpAsyncTask){
         this.lamps = lamps;
+        this.udpAsyncTask = udpAsyncTask;
     }
 
     @Override
@@ -42,6 +46,12 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 lamps.get(position).setState(holder.lampSwitch.isChecked());
+
+                try {
+                    udpAsyncTask.sendUDPdatagram( InetAddress.getByName( lamps.get( position ).getLampIP() ), lamps.get( position ).isOn() );
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
