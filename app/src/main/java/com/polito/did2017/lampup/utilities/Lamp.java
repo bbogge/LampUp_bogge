@@ -15,6 +15,13 @@ public class Lamp {
     private int mainAngle;
     private int secondaryAngle;
 
+    public Lamp(String lampURL, String lampName) {
+        this.lamp_IP = lampURL;
+        this.lamp_name = lampName;
+        //this.lamp_state = false;
+        //this.brightness = 0;
+    }
+
     public Lamp(String lampURL, String lampName, int lampImageID) {
         this.lamp_IP = lampURL;
         this.lamp_name = lampName;

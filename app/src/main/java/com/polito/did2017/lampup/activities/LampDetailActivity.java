@@ -283,9 +283,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     //setta la luminosità ad un minimo sindacale
-                    if (progress == 0)
-                        progress = MIN_LUM;
-                    selectedLamp.setBrightness( progress );
+
                 }
 
                 @Override
@@ -295,7 +293,10 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
                     Log.d( "Brightness", "Seekbar luminosità cambiata" );
+                    if (seekBar.getProgress() == 0)
+                        seekBar.setProgress( MIN_LUM );
                     selectedLamp.setBrightness( seekBar.getProgress() );
+
                     if (selectedLamp.isOn())
                         tcpClient.setMessage( setLum + "$" + selectedLamp.getBrightness() );
                 }
@@ -344,6 +345,9 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
 
         // si può modificare la brigthness solo se lo switch è attivo
         brightness.setEnabled( selectedLamp.isOn() );
+        if(selectedLamp.getBrightness() == 0) {
+            selectedLamp.setBrightness( MIN_LUM );
+        }
         brightness.setProgress( selectedLamp.getBrightness() );
         if(selectedLamp.isOn()) {
             brightness.getProgressDrawable().setAlpha( 255 );
@@ -358,6 +362,23 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        saveSwitchState();
+        saveLum();
+        saveLastColor();
+
+        if (tcpClient != null) {
+            tcpClient.stopClient();
+            tcpClient = null;
+        }
+        if(connectTask != null && tcpClient == null){
+            connectTask.cancel(true);
+            connectTask = null;
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
         saveSwitchState();
         saveLum();
         saveLastColor();

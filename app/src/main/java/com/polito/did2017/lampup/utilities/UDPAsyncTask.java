@@ -1,6 +1,8 @@
 package com.polito.did2017.lampup.utilities;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -11,6 +13,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Created by matil on 14/03/2018.
@@ -18,20 +22,27 @@ import java.net.UnknownHostException;
 
 public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
+    private Context context;
     private Runnable updateUI;
     private boolean keepListening;
     private final int udpPort = 4096;
-    private LampManager lm = LampManager.getInstance();
+    private LampManager lm;
     private boolean sendUDP;
     private boolean prevLampState;
     private InetAddress lampIP;
+    private Lamp lamp;
+
+    // per salvare lo stato precedente delle lampade della lista
+    private Dictionary<InetAddress, Boolean> lampPreviousState;
 
     DatagramSocket socket = null;
 
-    public UDPAsyncTask(Runnable updateUI) {
+    public UDPAsyncTask(Runnable updateUI, Context context, LampManager lm) {
         this.updateUI = updateUI;
         this.sendUDP = false;
         this.prevLampState = false;
+        this.context = context;
+        this.lm = lm;
     }
 
     @Override
@@ -66,8 +77,8 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
         while(keepListening) {
             if(sendUDP) {
 
-                messageStr = (!prevLampState) ? "turnOn" : "turnOff";
-                Log.d("doInBackground_udp", "!prevState: " + !prevLampState);
+                messageStr = (!lampPreviousState.get( lampIP )) ? "turnOn" : "turnOff";
+                Log.d("doInBackground_udp", "new state: " + !lampPreviousState.get( lampIP ));
 
                 msgLength = messageStr.length();
                 message = messageStr.getBytes();
@@ -76,7 +87,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
                     if (socket == null || socket.isClosed()) {
                         socket = new DatagramSocket(udpPort);
                     }
-                    socket.setSoTimeout(700);
+                    socket.setSoTimeout(400);
                 } catch (SocketException e) {
                     e.printStackTrace();
                 }*/
@@ -90,7 +101,8 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                prevLampState = !prevLampState;
+
+                lampPreviousState.put( lampIP, !lampPreviousState.get( lampIP ));
                 sendUDP = false;
             }
             Log.e("UDP", "Waiting for UDP broadcast");
@@ -104,6 +116,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
                 Log.e("UDP", "ricevuto broadcast UDP da: " + senderIP + ", lamp_name: " + lamp_name);
 
                 LampManager.getInstance().addLamp( senderIP, lamp_name );
+
                 this.publishProgress( "updateUI" );
 
             }
@@ -132,10 +145,16 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
         this.lampIP = lampIP;
 
         Log.d("sendUDPdatagram TASK", "lampState: " + lampState);
-        Log.d("sendUDPdatagram TASK", "prevState: " + prevLampState);
+        Log.d("sendUDPdatagram TASK", "prevState: " + lampPreviousState.get( lampIP ));
 
-        if(prevLampState != lampState)
+
+
+        if(lampPreviousState.get( lampIP ) != lampState) {
             sendUDP = true;
+        }
+
+        /*if(prevLampState != lampState)
+            sendUDP = true;*/
         Log.d("sendUDPdatagram TASK", "sendUDP" + sendUDP);
         /*
         else
@@ -166,5 +185,13 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
             e.printStackTrace();
         }*/
 
+    }
+
+    public Dictionary<InetAddress, Boolean> getLampPreviousState() {
+        return lampPreviousState;
+    }
+
+    public void setLampPreviousState(Dictionary<InetAddress, Boolean> lampPreviousState) {
+        this.lampPreviousState = lampPreviousState;
     }
 }

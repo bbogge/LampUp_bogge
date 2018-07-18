@@ -1,5 +1,6 @@
 package com.polito.did2017.lampup.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import com.polito.did2017.lampup.utilities.UDPAsyncTask;
 
 public class MainActivity extends AppCompatActivity {
 
+    Context context = this;
     private Button ok;
     private RecyclerView rv;
     private LampManager lampManager = LampManager.getInstance();
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             (rv.getAdapter()).notifyDataSetChanged();
         }
-    });
+    }, context, lampManager);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         lampManager.discover(udpAsyncTask);
 
-        adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask);
+        adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask, context);
         rv.setAdapter(adapter);
 
 //        ok = findViewById(R.id.button);

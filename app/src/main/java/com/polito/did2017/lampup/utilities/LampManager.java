@@ -1,12 +1,18 @@
 package com.polito.did2017.lampup.utilities;
 
+import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.polito.did2017.lampup.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Created by matil on 30/11/2017.
@@ -16,6 +22,7 @@ public class LampManager {
 
     private static final LampManager instance = new LampManager();
     private List<Lamp> lampList;
+    private Dictionary<Lamp, Boolean> lampPreviousState = new Hashtable<Lamp, Boolean>();
 
     //private constructor to avoid client applications to use constructor
     private LampManager() {
@@ -39,10 +46,23 @@ public class LampManager {
         lampList.add( new Lamp(lamp_ip, lamp_name,  R.drawable.ic_lightbulb_outline_black_24dp) );
     }
 
+    public void addPreviousLampState() {
+        for (int i = 0; i < lampList.size(); i++) {
+            /*if (lm.getLamps().get( i ).getLampName().equals( "gyro_lamp" )) {
+                lampPreviousState.put( lm.getLamps().get( i ), PreferenceManager.getDefaultSharedPreferences( context ).getBoolean( SWITCH_PREF, false ) );
+            } else {*/
+            lampPreviousState.put( lampList.get( i ), false );
+            //}
+        }
+
+    }
+
     public void discover(final UDPAsyncTask udpAsyncTask) {
         Log.d("!!!debug", "sono in discover");
 
         udpAsyncTask.execute();
+
+
     }
 
     /*public  void sendUDP_switchState(final UDPAsyncTask udpAsyncTask) {
