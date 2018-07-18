@@ -345,6 +345,14 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         // si può modificare la brigthness solo se lo switch è attivo
         brightness.setEnabled( selectedLamp.isOn() );
         brightness.setProgress( selectedLamp.getBrightness() );
+        if(selectedLamp.isOn()) {
+            brightness.getProgressDrawable().setAlpha( 255 );
+            brightness.getThumb().setAlpha( 255 );
+        } else {
+            brightness.getProgressDrawable().setAlpha(100);
+            brightness.getThumb().setAlpha(100);
+        }
+
     }
 
     @Override

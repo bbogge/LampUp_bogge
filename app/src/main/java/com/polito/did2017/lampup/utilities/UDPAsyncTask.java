@@ -22,11 +22,16 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
     private boolean keepListening;
     private final int udpPort = 4096;
     private LampManager lm = LampManager.getInstance();
+    private boolean sendUDP;
+    private boolean prevLampState;
+    private InetAddress lampIP;
 
     DatagramSocket socket = null;
 
     public UDPAsyncTask(Runnable updateUI) {
         this.updateUI = updateUI;
+        this.sendUDP = false;
+        this.prevLampState = false;
     }
 
     @Override
@@ -40,6 +45,12 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
         keepListening = true;
 
+        // msg to send
+        String messageStr;
+        int msgLength;
+        byte[] message;
+
+        // msg to receive
         byte[] recvBuf = new byte[64000];
         DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
 
@@ -53,6 +64,35 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
         }
 
         while(keepListening) {
+            if(sendUDP) {
+
+                messageStr = (!prevLampState) ? "turnOn" : "turnOff";
+                Log.d("doInBackground_udp", "!prevState: " + !prevLampState);
+
+                msgLength = messageStr.length();
+                message = messageStr.getBytes();
+
+                /*try {
+                    if (socket == null || socket.isClosed()) {
+                        socket = new DatagramSocket(udpPort);
+                    }
+                    socket.setSoTimeout(700);
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                }*/
+
+                DatagramPacket p = new DatagramPacket(message, msgLength, lampIP, udpPort);
+
+                try {
+                    socket.send(p);//properly able to send data. i receive data to server
+                    Log.e( "UDP SENDER TASK", "Inviato UDP a: " + lampIP + ", message: " + messageStr );
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                prevLampState = !prevLampState;
+                sendUDP = false;
+            }
             Log.e("UDP", "Waiting for UDP broadcast");
 
             try {
@@ -88,8 +128,21 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
     }
 
     public void sendUDPdatagram(InetAddress lampIP, boolean lampState) {
+
+        this.lampIP = lampIP;
+
+        Log.d("sendUDPdatagram TASK", "lampState: " + lampState);
+        Log.d("sendUDPdatagram TASK", "prevState: " + prevLampState);
+
+        if(prevLampState != lampState)
+            sendUDP = true;
+        Log.d("sendUDPdatagram TASK", "sendUDP" + sendUDP);
+        /*
+        else
+            sendUDP = false;*/
+
         // per inviare pacchetto udp per lo switch della lista lampade
-        String messageStr = (lampState) ? "turnOn" : "turnOff";
+        /*String messageStr = (lampState) ? "turnOn" : "turnOff";
 
         int msgLength = messageStr.length();
         byte[] message = messageStr.getBytes();
@@ -111,7 +164,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 }

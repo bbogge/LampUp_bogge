@@ -22,8 +22,9 @@ import java.util.List;
 
 public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder> {
 
-    List<Lamp> lamps;
-    UDPAsyncTask udpAsyncTask;
+    private List<Lamp> lamps;
+    private UDPAsyncTask udpAsyncTask;
+    private boolean sendUDP;
 
     public LampAdapter(List<Lamp> lamps, UDPAsyncTask udpAsyncTask){
         this.lamps = lamps;
