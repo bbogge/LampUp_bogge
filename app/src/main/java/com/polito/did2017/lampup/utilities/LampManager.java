@@ -22,9 +22,8 @@ public class LampManager {
 
     private static final LampManager instance = new LampManager();
     private List<Lamp> lampList;
-    private Dictionary<Lamp, Boolean> lampPreviousState = new Hashtable<Lamp, Boolean>();
 
-    //private constructor to avoid client applications to use constructor
+    // private constructor to avoid client applications to use constructor
     private LampManager() {
         lampList = Collections.synchronizedList( new ArrayList<Lamp>());
     }
@@ -46,22 +45,10 @@ public class LampManager {
         lampList.add( new Lamp(lamp_ip, lamp_name,  R.drawable.ic_lightbulb_outline_black_24dp) );
     }
 
-    public void addPreviousLampState() {
-        for (int i = 0; i < lampList.size(); i++) {
-            /*if (lm.getLamps().get( i ).getLampName().equals( "gyro_lamp" )) {
-                lampPreviousState.put( lm.getLamps().get( i ), PreferenceManager.getDefaultSharedPreferences( context ).getBoolean( SWITCH_PREF, false ) );
-            } else {*/
-            lampPreviousState.put( lampList.get( i ), false );
-            //}
-        }
-
-    }
-
     public void discover(final UDPAsyncTask udpAsyncTask) {
+
         Log.d("!!!debug", "sono in discover");
-
         udpAsyncTask.execute();
-
 
     }
 

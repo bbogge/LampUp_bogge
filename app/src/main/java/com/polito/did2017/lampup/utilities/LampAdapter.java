@@ -45,9 +45,11 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_lamp_card, parent, false);
         LampViewHolder lvh = new LampViewHolder(v);
 
+        // crea e inizializza il dizionario contenente gli stati precendenti di accensione di tutte le lampade trovate da discover e lo passa a UDPAsyncTask
         try {
             for (int i = 0; i < lamps.size(); i++) {
                 if (lamps.get( i ).getLampName().equals( "gyro_lamp" )) {
+                    // forse dovrebbe essere anche questo a false
                     lampPreviousState.put( InetAddress.getByName( lamps.get( i ).getLampIP() ), PreferenceManager.getDefaultSharedPreferences( context ).getBoolean( SWITCH_PREF, false ) );
                 } else {
 

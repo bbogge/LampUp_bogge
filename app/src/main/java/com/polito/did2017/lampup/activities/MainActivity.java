@@ -18,7 +18,6 @@ import com.polito.did2017.lampup.utilities.UDPAsyncTask;
 public class MainActivity extends AppCompatActivity {
 
     Context context = this;
-    private Button ok;
     private RecyclerView rv;
     private LampManager lampManager = LampManager.getInstance();
     private LampAdapter adapter;
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             (rv.getAdapter()).notifyDataSetChanged();
         }
-    }, context, lampManager);
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,28 +55,16 @@ public class MainActivity extends AppCompatActivity {
         adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask, context);
         rv.setAdapter(adapter);
 
-//        ok = findViewById(R.id.button);
-//
-//        ok.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent i = new Intent(MainActivity.this, LampDetailActivity.class);
-//                i.putExtra("lamp", 0);
-//                startActivity(i);
-//            }
-//        });
     }
 
     @Override
     protected void onResume() {
-        // per avere la lista aggiornata con solo le lampade presenti
         rv.getAdapter().notifyDataSetChanged();
         super.onResume();
     }
 
     @Override
     protected void onRestart() {
-        // per avere la lista aggiornata con solo le lampade presenti
         rv.getAdapter().notifyDataSetChanged();
         super.onRestart();
     }
