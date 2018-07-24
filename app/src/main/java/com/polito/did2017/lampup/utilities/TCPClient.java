@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -120,6 +121,8 @@ public class TCPClient {
                 socket.close();
                 if(sent.equals(message))
                     this.setMessage(DEFAULT);
+            } catch (ConnectException e) {
+                e.printStackTrace();
             } catch (SocketException e) {
                 e.printStackTrace();
             }

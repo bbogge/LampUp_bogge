@@ -1,5 +1,6 @@
 package com.polito.did2017.lampup.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,7 +17,7 @@ import com.polito.did2017.lampup.utilities.UDPAsyncTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button ok;
+    Context context = this;
     private RecyclerView rv;
     private LampManager lampManager = LampManager.getInstance();
     private LampAdapter adapter;
@@ -37,9 +38,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
 
-        adapter = new LampAdapter(lampManager.getLamps());
-        rv.setAdapter(adapter);
-
         ItemClickSupport.addTo(rv).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
             @Override
             public void onItemClicked(RecyclerView recyclerView, int position, View v) {
@@ -54,22 +52,21 @@ public class MainActivity extends AppCompatActivity {
 
         lampManager.discover(udpAsyncTask);
 
-//        ok = findViewById(R.id.button);
-//
-//        ok.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent i = new Intent(MainActivity.this, LampDetailActivity.class);
-//                i.putExtra("lamp", 0);
-//                startActivity(i);
-//            }
-//        });
+        adapter = new LampAdapter(lampManager.getLamps(), udpAsyncTask, context);
+        rv.setAdapter(adapter);
+
     }
 
     @Override
     protected void onResume() {
         rv.getAdapter().notifyDataSetChanged();
         super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        rv.getAdapter().notifyDataSetChanged();
+        super.onRestart();
     }
 
     @Override
