@@ -18,6 +18,14 @@
         android:elevation="4dp"
         app:titleTextAppearance="@style/Toolbar.TitleText">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LampUp"
+            android:textSize="25sp"
+            android:gravity="center"
+            android:layout_marginRight="15dp"/>
+
     </android.support.v7.widget.Toolbar>
 
     <android.support.v7.widget.RecyclerView
