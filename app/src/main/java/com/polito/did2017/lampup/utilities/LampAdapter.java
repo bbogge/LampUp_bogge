@@ -30,7 +30,6 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
     private List<Lamp> lamps;
     private UDPAsyncTask udpAsyncTask;
     private static final String SWITCH_PREF = "LastSwitchState";
-    private boolean sendUDP;
     private Dictionary<InetAddress, Boolean> lampPreviousState;
 
     public LampAdapter(List<Lamp> lamps, UDPAsyncTask udpAsyncTask, Context context){
@@ -46,7 +45,7 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
         LampViewHolder lvh = new LampViewHolder(v);
 
         // crea e inizializza il dizionario contenente gli stati precendenti di accensione di tutte le lampade trovate da discover e lo passa a UDPAsyncTask
-        try {
+        /*try {
             for (int i = 0; i < lamps.size(); i++) {
                 if (lamps.get( i ).getLampName().equals( "gyro_lamp" )) {
                     // forse dovrebbe essere anche questo a false
@@ -60,7 +59,7 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         return lvh;

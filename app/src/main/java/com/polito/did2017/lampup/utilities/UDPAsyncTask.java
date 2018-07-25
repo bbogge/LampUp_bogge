@@ -33,6 +33,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
     private Dictionary<InetAddress, Boolean> lampPreviousState;
 
     DatagramSocket socket = null;
+    private boolean lampState;
 
     public UDPAsyncTask(Runnable updateUI) {
         this.updateUI = updateUI;
@@ -73,8 +74,10 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
             if(sendUDP) {
 
                 // è avvenuto uno switch di accensione/spegnimento -> mando il pacchetto
-                messageStr = (!lampPreviousState.get( lampIP )) ? "turnOn" : "turnOff";
-                Log.d("doInBackground_udp", "new state: " + !lampPreviousState.get( lampIP ));
+                //messageStr = (!lampPreviousState.get( lampIP )) ? "turnOn" : "turnOff";
+                messageStr = (lampState) ? "turnOn" : "turnOff";
+                //Log.d("doInBackground_udp", "new state: " + !lampPreviousState.get( lampIP ));
+                Log.d("doInBackground_udp", "new state: " + lampState);
 
                 msgLength = messageStr.length();
                 message = messageStr.getBytes();
@@ -90,7 +93,7 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
                 }
 
                 // aggiorna lo stato della lampada nel dizionario apposito
-                lampPreviousState.put( lampIP, !lampPreviousState.get( lampIP ));
+                //lampPreviousState.put( lampIP, !lampPreviousState.get( lampIP ));
                 sendUDP = false;
             }
             Log.e("UDP", "Waiting for UDP broadcast");
@@ -131,19 +134,15 @@ public class UDPAsyncTask extends AsyncTask<Object, String, Integer> {
     public void sendUDPdatagram(InetAddress lampIP, boolean lampState) {
 
         this.lampIP = lampIP;
+        this.lampState = lampState;
 
         Log.d("sendUDPdatagram TASK", "lampState: " + lampState);
-        Log.d("sendUDPdatagram TASK", "prevState: " + lampPreviousState.get( lampIP ));
+        //Log.d("sendUDPdatagram TASK", "prevState: " + lampPreviousState.get( lampIP ));
 
+        //if(lampPreviousState.get( lampIP ) != lampState) {
+        sendUDP = true;
+        //}
 
-
-        if(lampPreviousState.get( lampIP ) != lampState) {
-            sendUDP = true;
-        }
-
-        // vecchia versione
-        /*if(prevLampState != lampState)
-            sendUDP = true;*/
         Log.d("sendUDPdatagram TASK", "sendUDP" + sendUDP);
     }
 
