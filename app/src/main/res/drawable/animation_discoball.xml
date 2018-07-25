@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dicsoball_on" android:oneshot="false">
+    <item android:drawable="@drawable/discoball_on1x48" android:duration="500" />
+    <item android:drawable="@drawable/discoball_on2x48" android:duration="500" />
+</animation-list>
