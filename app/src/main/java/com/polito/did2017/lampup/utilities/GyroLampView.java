@@ -53,14 +53,14 @@ public class GyroLampView extends View {
         float holeOffsetL;
         float holeOffsetR;
         if(angle<=80) {
-            angulation = (angle/180)+0.5f;
-            holeOffsetL = (90-angle)/4.5f;
+            angulation = (angle/160)+0.5f;
+            holeOffsetL = (80-angle)/4.5f;
             holeOffsetR = 0;
         }
         else {
-            angulation = 1.5f-(angle/180);
+            angulation = 1.5f-(angle/160);
             holeOffsetL = 0;
-            holeOffsetR = (90-angle)/4.5f;
+            holeOffsetR = (80-angle)/4.5f;
         }
         float inside_delta = 150;
         float hole_margin = 20;
@@ -69,7 +69,7 @@ public class GyroLampView extends View {
         float r3 = r1*7/6;
         float r4 = (h-inside_delta-2*hole_margin)*angulation;
         float outer_margin = strokeBrush.getStrokeWidth()/2;
-        float offset = (90-angle)/4.5f;
+        float offset = (80-angle)/4.5f;
 
         //width
         canvas.drawOval(new RectF((w-r1)/2+offset, 0+outer_margin, (w+r1)/2+offset, h-outer_margin), widthStrokeBrush);   //outer circle

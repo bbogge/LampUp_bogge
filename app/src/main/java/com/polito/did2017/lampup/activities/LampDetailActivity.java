@@ -50,6 +50,7 @@ import org.w3c.dom.Text;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 import static java.lang.Thread.sleep;
 
@@ -89,6 +90,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private final String switchState = "switchState";
     private final String setLum = "setLum";
     private final String setMainServo = "setMainServo";
+    private final String setSecondaryServo = "setSecondaryServo";
     private final String setHueSat = "setHueSat";
 
     //private final int MIN_LUM = 5;
@@ -317,7 +319,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         //selectedLamp.setState(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SWITCH_PREF, false));
         selectedLamp.setBrightness(PreferenceManager.getDefaultSharedPreferences(context).getInt(LUM_PREF, 128));
 
-        textLampName.setText( selectedLamp.getLampName() );
+        textLampName.setText(lampManager.convertName(selectedLamp.getLampName()));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && selectedLamp.isOn()) {
             switchOnOff.setTrackTintMode( PorterDuff.Mode.SCREEN );
@@ -524,6 +526,16 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     public void sendAngleMessage(int progress) {
         tcpClient.setMessage(setMainServo + "$" + progress);
         saveAngle(progress);
+    }
+
+    @Override
+    public void sendDiscoMessage(boolean checked) {
+        if(checked) {
+            tcpClient.setMessage(setSecondaryServo + "$1");
+        }
+        else {
+            tcpClient.setMessage(setSecondaryServo + "$0");
+        }
     }
 
     public void saveColors(ArrayList<Integer> colors, String key) {

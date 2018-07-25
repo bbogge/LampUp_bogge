@@ -32,6 +32,7 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
     private static final String SWITCH_PREF = "LastSwitchState";
     private boolean sendUDP;
     private Dictionary<InetAddress, Boolean> lampPreviousState;
+    private LampManager lm = LampManager.getInstance();
 
     public LampAdapter(List<Lamp> lamps, UDPAsyncTask udpAsyncTask, Context context){
         this.context = context;
@@ -69,7 +70,7 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
     @Override
     public void onBindViewHolder(final LampViewHolder holder, final int position) {
 
-        holder.lampName.setText(lamps.get(position).getLampName());
+        holder.lampName.setText(lm.convertName(lamps.get(position).getLampName()));
         holder.lampPhoto.setImageResource(lamps.get(position).getLampImage());
         holder.lampSwitch.setChecked( lamps.get( position ).isOn() );
         holder.lampSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

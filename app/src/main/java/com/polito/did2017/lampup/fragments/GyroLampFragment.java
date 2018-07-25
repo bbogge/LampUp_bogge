@@ -1,12 +1,15 @@
 package com.polito.did2017.lampup.fragments;
 
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 
 import com.polito.did2017.lampup.utilities.GyroLampView;
@@ -29,6 +32,7 @@ public class GyroLampFragment extends Fragment {
 
     private GyroLampView gyro;
     private SeekBar sb;
+    private CheckBox cb;
     private int angle;
 
     // TODO: Rename and change types of parameters
@@ -76,6 +80,7 @@ public class GyroLampFragment extends Fragment {
 
         gyro = view.findViewById(R.id.gyro_lamp);
         sb = view.findViewById(R.id.seekBar);
+        cb = view.findViewById(R.id.checkBox);
         sb.setProgress(angle);
         gyro.setAngle(angle);
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -92,6 +97,23 @@ public class GyroLampFragment extends Fragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mListener.sendAngleMessage(seekBar.getProgress());
+            }
+        });
+
+        final AnimationDrawable frameAnimation = (AnimationDrawable) getResources().getDrawable(R.drawable.animation_discoball);
+
+        cb.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(compoundButton.isChecked()) {
+                    compoundButton.setButtonDrawable(frameAnimation);
+                    frameAnimation.start();
+                }
+                else {
+                    frameAnimation.stop();
+                    compoundButton.setButtonDrawable(R.drawable.discoball_offx48);
+                }
+                mListener.sendDiscoMessage(compoundButton.isChecked());
             }
         });
 
@@ -140,5 +162,6 @@ public class GyroLampFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
         void sendAngleMessage(int progress);
+        void sendDiscoMessage(boolean checked);
     }
 }
