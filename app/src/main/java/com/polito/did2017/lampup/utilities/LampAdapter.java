@@ -33,34 +33,23 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
     private Dictionary<InetAddress, Boolean> lampPreviousState;
     private LampManager lm = LampManager.getInstance();
 
-    public LampAdapter(List<Lamp> lamps, UDPAsyncTask udpAsyncTask, Context context){
+    public LampAdapter(List<Lamp> lamps, UDPAsyncTask udpAsyncTask, Context context) {
         this.context = context;
         this.lamps = lamps;
         this.udpAsyncTask = udpAsyncTask;
-        lampPreviousState = new Hashtable<>(  );
+        lampPreviousState = new Hashtable<>();
     }
 
     @Override
     public LampViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_lamp_card, parent, false);
-        LampViewHolder lvh = new LampViewHolder(v);
+        View v = LayoutInflater.from( parent.getContext() ).inflate( R.layout.item_lamp_card, parent, false );
+        LampViewHolder lvh = new LampViewHolder( v );
 
-        // crea e inizializza il dizionario contenente gli stati precendenti di accensione di tutte le lampade trovate da discover e lo passa a UDPAsyncTask
-        /*try {
-            for (int i = 0; i < lamps.size(); i++) {
-                if (lamps.get( i ).getLampName().equals( "gyro_lamp" )) {
-                    // forse dovrebbe essere anche questo a false
-                    lampPreviousState.put( InetAddress.getByName( lamps.get( i ).getLampIP() ), PreferenceManager.getDefaultSharedPreferences( context ).getBoolean( SWITCH_PREF, false ) );
-                } else {
-
-                    lampPreviousState.put( InetAddress.getByName( lamps.get( i ).getLampIP() ), false );
-
-                }
-                udpAsyncTask.setLampPreviousState( lampPreviousState );
+        for (int i = 0; i < lamps.size(); i++) {
+            if (lamps.get( i ).getLampName().equals( "gyro_lamp" )) {
+                lamps.get( i ).setState( PreferenceManager.getDefaultSharedPreferences( context ).getBoolean( SWITCH_PREF, false ) );
             }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }*/
+        }
 
 
         return lvh;
@@ -69,13 +58,13 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
     @Override
     public void onBindViewHolder(final LampViewHolder holder, final int position) {
 
-        holder.lampName.setText(lm.convertName(lamps.get(position).getLampName()));
-        holder.lampPhoto.setImageResource(lamps.get(position).getLampImage());
+        holder.lampName.setText( lm.convertName( lamps.get( position ).getLampName() ) );
+        holder.lampPhoto.setImageResource( lamps.get( position ).getLampImage() );
         holder.lampSwitch.setChecked( lamps.get( position ).isOn() );
-        holder.lampSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        holder.lampSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                lamps.get(position).setState(holder.lampSwitch.isChecked());
+                lamps.get( position ).setState( holder.lampSwitch.isChecked() );
 
                 Log.d( "UDP SENDER", "Sono al listener del check" );
                 try {
@@ -84,7 +73,7 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
                     e.printStackTrace();
                 }
             }
-        });
+        } );
     }
 
     @Override
@@ -99,10 +88,10 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
         Switch lampSwitch;
 
         LampViewHolder(View itemView) {
-            super(itemView);
-            lampName = itemView.findViewById(R.id.lamp_name);
-            lampPhoto = itemView.findViewById(R.id.lamp_photo);
-            lampSwitch = itemView.findViewById(R.id.lamp_switch);
+            super( itemView );
+            lampName = itemView.findViewById( R.id.lamp_name );
+            lampPhoto = itemView.findViewById( R.id.lamp_photo );
+            lampSwitch = itemView.findViewById( R.id.lamp_switch );
 
         }
     }

@@ -2,6 +2,8 @@ package com.polito.did2017.lampup.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +19,7 @@ import com.polito.did2017.lampup.utilities.UDPAsyncTask;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final static String SWITCH_PREF = "LastSwitchState";
     Context context = this;
     private RecyclerView rv;
     private LampManager lampManager = LampManager.getInstance();
@@ -57,6 +60,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void saveSwitchState() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        for (int i = 0; i < lampManager.getLamps().size(); i++) {
+            if (lampManager.getLamps().get( i ).getLampName().equals( "gyro_lamp" )) {
+                editor.putBoolean(SWITCH_PREF, lampManager.getLamps().get( i ).isOn());
+                editor.commit();
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         rv.getAdapter().notifyDataSetChanged();
@@ -71,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        udpAsyncTask.stopListening();
         super.onDestroy();
+        saveSwitchState();
+        udpAsyncTask.stopListening();
     }
 }

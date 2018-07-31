@@ -191,7 +191,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         connectTask.executeOnExecutor( AsyncTask.THREAD_POOL_EXECUTOR, tcpClient );
 
         // SWITCH ON-OFF
-        switchOnOff.setChecked( selectedLamp.isOn() );
+        //switchOnOff.setChecked( selectedLamp.isOn() );
         switchOnOff.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -316,6 +316,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     }
 
     private void initLamp(Lamp selectedLamp) {
+        switchOnOff.setChecked( selectedLamp.isOn() );
         //selectedLamp.setState(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(SWITCH_PREF, false));
         selectedLamp.setBrightness(PreferenceManager.getDefaultSharedPreferences(context).getInt(LUM_PREF, 128));
 
@@ -363,15 +364,6 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         saveSwitchState();
         saveLum();
         saveLastColor();
-
-        if (tcpClient != null) {
-            tcpClient.stopClient();
-            tcpClient = null;
-        }
-        if(connectTask != null && tcpClient == null){
-            connectTask.cancel(true);
-            connectTask = null;
-        }
     }
 
     @Override
@@ -380,15 +372,6 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         saveSwitchState();
         saveLum();
         saveLastColor();
-
-        if (tcpClient != null) {
-            tcpClient.stopClient();
-            tcpClient = null;
-        }
-        if(connectTask != null && tcpClient == null){
-            connectTask.cancel(true);
-            connectTask = null;
-        }
     }
 
     private void checkLampId(String fragId) {
@@ -524,17 +507,23 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
 
     @Override
     public void sendAngleMessage(int progress) {
-        tcpClient.setMessage(setMainServo + "$" + progress);
-        saveAngle(progress);
+        if(tcpClient != null) {
+            tcpClient.setMessage( setMainServo + "$" + progress );
+            saveAngle( progress );
+        }
     }
 
     @Override
     public void sendDiscoMessage(boolean checked) {
         if(checked) {
-            tcpClient.setMessage(setSecondaryServo + "$1");
+            if(tcpClient != null) {
+                tcpClient.setMessage( setSecondaryServo + "$1" );
+            }
         }
         else {
-            tcpClient.setMessage(setSecondaryServo + "$0");
+            if(tcpClient != null) {
+                tcpClient.setMessage( setSecondaryServo + "$0" );
+            }
         }
     }
 

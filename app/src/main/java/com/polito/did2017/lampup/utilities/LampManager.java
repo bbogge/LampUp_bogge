@@ -1,7 +1,5 @@
 package com.polito.did2017.lampup.utilities;
 
-import android.content.Context;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.polito.did2017.lampup.R;
@@ -10,11 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.List;
-
-import static java.lang.Thread.sleep;
 
 /**
  * Created by matil on 30/11/2017.
