@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.polito.did2017.lampup.R;
 import com.polito.did2017.lampup.utilities.ItemClickSupport;

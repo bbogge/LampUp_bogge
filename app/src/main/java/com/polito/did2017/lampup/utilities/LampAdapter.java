@@ -1,6 +1,9 @@
 package com.polito.did2017.lampup.utilities;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,9 +13,11 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.polito.did2017.lampup.R;
+import com.squareup.picasso.Picasso;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -51,7 +56,6 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
             }
         }
 
-
         return lvh;
     }
 
@@ -59,7 +63,13 @@ public class LampAdapter extends RecyclerView.Adapter<LampAdapter.LampViewHolder
     public void onBindViewHolder(final LampViewHolder holder, final int position) {
 
         holder.lampName.setText( lm.convertName( lamps.get( position ).getLampName() ) );
-        holder.lampPhoto.setImageResource( lamps.get( position ).getLampImage() );
+
+        if(lamps.get( position ).getLampImage() == "default") {
+            holder.lampPhoto.setImageResource( R.drawable.ic_lightbulb_outline_black_24dp);
+        } else {
+            Picasso.get().load(lamps.get( position ).getLampImage()).into(holder.lampPhoto);
+        }
+
         holder.lampSwitch.setChecked( lamps.get( position ).isOn() );
         holder.lampSwitch.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener() {
             @Override

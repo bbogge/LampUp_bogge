@@ -2,8 +2,6 @@ package com.polito.did2017.lampup.utilities;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +16,7 @@ import com.polito.did2017.lampup.R;
 import java.util.ArrayList;
 
 import static com.polito.did2017.lampup.activities.LampDetailActivity.HSVtoRGBConvertFactor;
+import static com.polito.did2017.lampup.activities.LampDetailActivity.colorRemoval;
 import static com.polito.did2017.lampup.activities.LampDetailActivity.colorSelection;
 import static java.lang.Thread.sleep;
 
@@ -99,6 +98,14 @@ public class ColorGridAdapter extends BaseAdapter {
 
             }
         });
+
+        view.setOnLongClickListener( new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                colorRemoval(index, context);
+                return false;
+            }
+        } );
 
 //        if(view==null) {
 //            LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -38,7 +38,16 @@ public class LampManager {
                 return;
             }
         }
-        lampList.add( new Lamp(lamp_ip, lamp_name,  R.drawable.ic_lightbulb_outline_black_24dp) );
+        lampList.add( new Lamp(lamp_ip, lamp_name,  getImgURL( lamp_name ) ));
+    }
+
+    public String getImgURL(String lampName) {
+        switch (lampName) {
+            case "gyro_lamp":
+                return "https://i.imgur.com/L4nA9nS.jpg?1";
+            default:
+                return "default";
+        }
     }
 
     public void discover(final UDPAsyncTask udpAsyncTask) {

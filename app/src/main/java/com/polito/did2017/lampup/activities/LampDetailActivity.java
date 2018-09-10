@@ -1,6 +1,8 @@
 package com.polito.did2017.lampup.activities;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -19,6 +21,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -65,7 +68,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private final static int MIN_LUM = 5;
     private FABRevealLayout fabRevealLayout;
     private static GridView color_grid;
-    private ColorGridAdapter cga;
+    private static ColorGridAdapter cga;
     private LinearLayout color_picker;
     private LinearLayout color;
     private SeekBar hue, saturation, brightness;
@@ -74,7 +77,7 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
     private Fragment fragment;
     private float[] hsv = new float[3];
     public static float HSVtoRGBConvertFactor = 255.0f/360.0f;
-    private ArrayList<Integer> colors = new ArrayList<>();
+    private static ArrayList<Integer> colors = new ArrayList<>();
     private int lastSize = 0;
     private static int lastSelectedColor;
 
@@ -356,6 +359,9 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
             connectTask.cancel(true);
             connectTask = null;
         }
+
+
+        saveColors( colors, COLORS_PREFS );
     }
 
     @Override
@@ -576,5 +582,33 @@ public class LampDetailActivity extends AppCompatActivity implements GyroLampFra
         color_grid.getChildAt(lastSelectedColor).setSelected(false);
         color_grid.getChildAt(i).setSelected(true);
         lastSelectedColor = i;
+    }
+
+    public static void colorRemoval(final int i, Context context) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+//        LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+//        final View dialogView = inflater.inflate(R.layout.isbn_istruction_fragment, null);
+//        dialogBuilder.setView(dialogView);
+
+        dialogBuilder.setMessage( "Vuoi eliminare questo colore?" );
+        dialogBuilder.setCancelable( true );
+
+        dialogBuilder.setPositiveButton("Sì", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int whichButton) {
+                colors.remove( i );
+                cga.notifyDataSetChanged();
+            }
+        });
+
+        dialogBuilder.setNegativeButton( "No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        } );
+
+        AlertDialog b = dialogBuilder.create();
+        b.show();
     }
 }

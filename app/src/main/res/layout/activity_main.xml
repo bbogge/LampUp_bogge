@@ -34,11 +34,14 @@
         android:layout_gravity="center_horizontal">
 
         <TextView
+            android:id="@+id/noLampsTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nessuna lampada nelle vicinanze!"
+            android:text=" Nessuna lampada nelle vicinanze!"
             android:textColor="@color/divideColor"
-            android:textSize="20sp"/>
+            android:textSize="20sp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/lamp_list"

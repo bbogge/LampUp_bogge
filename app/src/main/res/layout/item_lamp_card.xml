@@ -17,9 +17,7 @@
             android:layout_height="140dp"
             android:layout_margin="10dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:src="@drawable/ic_lightbulb_outline_black_24dp"
-            android:tint="@color/colorAccent"/>
+            android:layout_alignParentTop="true"/>
 
         <TextView
             android:id="@+id/lamp_name"
