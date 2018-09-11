@@ -44,7 +44,8 @@ public class LampManager {
     public String getImgURL(String lampName) {
         switch (lampName) {
             case "gyro_lamp":
-                return "https://i.imgur.com/L4nA9nS.jpg?1";
+                //return "https://i.imgur.com/L4nA9nS.jpg?1";
+                return "https://i.imgur.com/684ZzZt.jpg?3";
             default:
                 return "default";
         }
